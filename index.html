@@ -1,64 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>White Day</title>
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 </head>
 <body>
 
 <div id="app">
   <div class="mainImage">
-    <img src="" alt="">
+    <img src="img/logo.png" alt="">
+    <div class="mainMessage">
+      <p>いつもありがとうございます。ああああああああああああ。</p>
+      <p>いつもありがとうございます。ああああああああああああ。</p>
+      <p>いつもありがとうございます。ああああああああああああ。</p>
+    </div>
   </div>
-  <div class="mainMessage"></div>
   <div class="container">
     <div class="boxListWrapper">
       <template v-for="(row, i) in ['top', 'middle', 'bottom']" :key="i">
         <ul class="boxList" :class="row">
           <template v-for="(col, i) in ['first', 'second']" :key="i">
-            <li class="box" v-for="(message, i) in MESSAGES" :key="i">{{ message.name }}</li>
+            <li class="box" v-for="(message, i) in getMessages(row)" :key="i" :class="{ opened: message.opened }" @click="open(message)">
+              <div class="name">{{ message.name }}</div>
+              <div class="boxImage">
+                <img class="boxImage-box" :src="`img/box${message.num}.png`">
+                <img class="boxImage-cover" :src="`img/cover${message.num}.png`" v-if="!message.opened">
+              </div>
+            </li>
           </template>
         </ul>
       </template>
     </div>
   </div>
+  <div class="modal" v-if="modal" @click="close">
+    <div class="modal-content" @click="clickModalArea">
+      <p class="modal-content-text">{{ modal.text }}</p>
+      <p class="modal-content-name">by {{ modal.name }}</p>
+      <a class="button" :href="`https://gift.starbucks.co.jp/c/${params.hash}`" target="_blank">ギフトを受け取る</a>
+      <div class="close" @click="close">×</div>
+    </div>
+  </div>
+  <footer>© LB Inc.</footer>
 </div>
 
 <script>
-const MESSAGES = [
-  { name: 'mizuno', text: 'ハッピーバレンタイン', opened: false },
-  { name: 'trun', text: 'ちゅんだよー', opened: false },
-  { name: 'nkitamura', text: 'i like you', opened: false },
-  { name: 'name', text: 'いつもありがとうございます', opened: false },
-  { name: 'itam', text: 'スタバ', opened: false }
-];
 const app = new Vue({
   el: '#app',
   data: {
-    per: 0
+    messages: [],
+    per: 0,
+    modal: null,
+    params: {}
   },
   created () {
-    this.random();
-    this.per = Math.ceil(MESSAGES.length / 3);
+    fetch('messages.json').then(response => {
+      return response.json();
+    }).then(json => {
+      this.messages = json;
+      this.random();
+      this.setParams();
+      this.per = Math.ceil(this.messages.length / 3);
+    });
   },
   methods: {
     random () {
-      for(let i = MESSAGES.length - 1; i > 0; i--) {
+      for(let i = this.messages.length - 1; i > 0; i--) {
         const r = Math.floor(Math.random() * (i + 1));
-        const tmp = MESSAGES[i];
-        MESSAGES[i] = MESSAGES[r];
-        MESSAGES[r] = tmp;
+        const tmp = this.messages[i];
+        tmp.num = Math.floor(Math.random() * 3) + 1;
+        this.messages[i] = this.messages[r];
+        this.messages[r] = tmp;
       }
+      for(let i = this.messages.length - 1; i > 0; i--) {
+        this.messages[i].num = Math.floor(Math.random() * 3) + 1;
+      }
+    },
+    setParams () {
+      const urlParam = location.search.substring(1);
+      if (urlParam) {
+        urlParam.split('&').forEach(v => {
+          const keyVal = v.split('=');
+          this.params[keyVal[0]] = keyVal[1];
+        });
+      }
+    },
+    getMessages (name) {
+      switch (name) {
+        case 'top': return this.top;
+        case 'middle': return this.middle;
+        case 'bottom': return this.bottom;
+      }
+    },
+    open (message) {
+      this.modal = message;
+      message.opened = true;
+    },
+    close (e) {
+      this.modal = null;
+    },
+    clickModalArea (e) {
+      e.stopPropagation();
     }
   },
   computed: {
-    first () {
-      return MESSAGES.filter((v, i) => {
-        return true;
-      })
+    top () {
+      return this.messages.filter((v, i) => i >= 0 && i < this.per);
+    },
+    middle () {
+      return this.messages.filter((v, i) => i >= this.per && i < this.per * 2);
+    },
+    bottom () {
+      return this.messages.filter((v, i) => i >= this.per * 2 && i < this.per * 3);
     }
   }
 });
@@ -70,12 +125,40 @@ const app = new Vue({
   padding: 0;
   list-style: none;
   max-width: 100%;
+  box-sizing: border-box;
+}
+body {
+  font-size: 14px;
+  background: #eceade;
+  background: #ddd;
 }
 .container {
   max-width: 1000px;
   margin: auto;
-  background: #FAFAFA;
+  padding: 60px 0 80px;
   overflow: hidden;
+}
+.mainImage {
+  background: url('img/bg.png');
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-top: 10px solid #112;
+  border-bottom: 6px double #a1984a;
+}
+.mainImage img {
+  width: 320px;
+  margin: auto auto 20px;
+}
+.mainMessage {
+  margin: 20px auto auto;
+  padding: 0 20px;
+  font-size: 14px;
+  color: #818181;
+  text-align: center;
+  line-height: 1.9;
 }
 .boxListWrapper {
   position: relative;
@@ -92,11 +175,11 @@ const app = new Vue({
   pointer-events: none;
 }
 .boxListWrapper::before {
-  background: linear-gradient(to right, #FFF, transparent);
+  background: linear-gradient(to right, #ddd, transparent);
   left: 0;
 }
 .boxListWrapper::after {
-  background: linear-gradient(to left, #FFF, transparent);
+  background: linear-gradient(to left, #ddd, transparent);
   right: 0;
 }
 .boxList {
@@ -106,16 +189,110 @@ const app = new Vue({
 }
 .boxList.top,
 .boxList.bottom {
-  animation: scroll1 20s linear 0s infinite normal;
+  animation: scroll1 40s linear 0s infinite normal;
 }
 .boxList.middle {
-  animation: scroll2 20s linear 0s infinite normal;
+  animation: scroll2 40s linear 0s infinite normal;
 }
 .box {
-  background: #EEE;
+  position: relative;
+  background: rgba(255, 255, 255, 0.4);
   width: 200px;
   height: 200px;
   margin: 10px;
+  cursor: pointer;
+  border-radius: 100px;
+  overflow: visible;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.box .name {
+  position: absolute;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 13px;
+  padding: 2px 10px;
+  border-radius: 100px;
+}
+.boxImage {
+  width: 60%;
+  position: relative;
+}
+.boxImage-box {
+  width: 100%;
+}
+.boxImage-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+.modal {
+  background: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-content {
+  position: relative;
+  background: #fff;
+  color: #a1984a;
+  padding: 50px 60px;
+  margin: auto;
+  width: 90%;
+  max-width: 400px;
+  line-height: 1.9;
+}
+.modal-content-name {
+  text-align: center;
+  margin-top: 10px;
+}
+.button {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+  padding: 5px 10px;
+  margin: 20px 0 0;
+  font-size: 16px;
+  border: 2px solid #a1984a;
+  color: #a1984a;
+  cursor: pointer;
+}
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #a1984a;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+}
+footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #112;
+  min-height: 120px;
+  font-size: 12px;
+  color: #818181;
+  text-align: center;
 }
 @keyframes scroll1 {
   0% {
@@ -131,6 +308,15 @@ const app = new Vue({
   }
   100% {
     transform: translateX(0);
+  }
+}
+@media (max-width: 600px) {
+  .mainImage img {
+    width: 240px;
+  }
+  .box {
+    width: 120px;
+    height: 120px;
   }
 }
 </style>
