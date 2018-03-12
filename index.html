@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+
+<div id="app">
+  <div class="mainImage">
+    <img src="" alt="">
+  </div>
+  <div class="mainMessage"></div>
+  <div class="container">
+    <div class="boxListWrapper">
+      <template v-for="(row, i) in ['top', 'middle', 'bottom']" :key="i">
+        <ul class="boxList" :class="row">
+          <template v-for="(col, i) in ['first', 'second']" :key="i">
+            <li class="box" v-for="(message, i) in MESSAGES" :key="i">{{ message.name }}</li>
+          </template>
+        </ul>
+      </template>
+    </div>
+  </div>
+</div>
+
+<script>
+const MESSAGES = [
+  { name: 'mizuno', text: 'ハッピーバレンタイン', opened: false },
+  { name: 'trun', text: 'ちゅんだよー', opened: false },
+  { name: 'nkitamura', text: 'i like you', opened: false },
+  { name: 'name', text: 'いつもありがとうございます', opened: false },
+  { name: 'itam', text: 'スタバ', opened: false }
+];
+const app = new Vue({
+  el: '#app',
+  data: {
+    per: 0
+  },
+  created () {
+    this.random();
+    this.per = Math.ceil(MESSAGES.length / 3);
+  },
+  methods: {
+    random () {
+      for(let i = MESSAGES.length - 1; i > 0; i--) {
+        const r = Math.floor(Math.random() * (i + 1));
+        const tmp = MESSAGES[i];
+        MESSAGES[i] = MESSAGES[r];
+        MESSAGES[r] = tmp;
+      }
+    }
+  },
+  computed: {
+    first () {
+      return MESSAGES.filter((v, i) => {
+        return true;
+      })
+    }
+  }
+});
+</script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 100%;
+}
+.container {
+  max-width: 1000px;
+  margin: auto;
+  background: #FAFAFA;
+  overflow: hidden;
+}
+.boxListWrapper {
+  position: relative;
+  overflow: hidden;
+}
+.boxListWrapper::before,
+.boxListWrapper::after {
+  position: absolute;
+  content: '';
+  top: 0;
+  bottom: 0;
+  width: 50px;
+  z-index: 100;
+  pointer-events: none;
+}
+.boxListWrapper::before {
+  background: linear-gradient(to right, #FFF, transparent);
+  left: 0;
+}
+.boxListWrapper::after {
+  background: linear-gradient(to left, #FFF, transparent);
+  right: 0;
+}
+.boxList {
+  display: flex;
+  width: max-content;
+  max-width: none;
+}
+.boxList.top,
+.boxList.bottom {
+  animation: scroll1 20s linear 0s infinite normal;
+}
+.boxList.middle {
+  animation: scroll2 20s linear 0s infinite normal;
+}
+.box {
+  background: #EEE;
+  width: 200px;
+  height: 200px;
+  margin: 10px;
+}
+@keyframes scroll1 {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+@keyframes scroll2 {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+</style>
+
+</body>
+</html>
