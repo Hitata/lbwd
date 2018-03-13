@@ -13,9 +13,9 @@
   <div class="mainImage">
     <img src="img/logo.png" alt="">
     <div class="mainMessage">
-      <p>いつもありがとうございます。ああああああああああああ。</p>
-      <p>いつもありがとうございます。ああああああああああああ。</p>
-      <p>いつもありがとうございます。ああああああああああああ。</p>
+      <p>先日は素敵なバレンタインデーをありがとうございました！</p>
+      <p>男性社員からそれぞれメッセージが届いていますので、</p>
+      <p>ぜひ、気に入ったメッセージからギフトをお受取りください！</p>
     </div>
   </div>
   <div class="container">
@@ -23,10 +23,10 @@
       <template v-for="(row, i) in ['top', 'middle', 'bottom']" :key="i">
         <ul class="boxList" :class="row">
           <template v-for="(col, i) in ['first', 'second']" :key="i">
-            <li class="box" v-for="(message, i) in getMessages(row)" :key="i" :class="{ opened: message.opened }" @click="open(message)">
+            <li class="box" v-for="(message, i) in messages[row]" :key="i" :class="{ opened: message.opened }" @click="open(message)">
               <div class="name">{{ message.name }}</div>
               <div class="boxImage">
-                <img class="boxImage-img" :src="`img/box${message.num}.png`" v-if="!message.opened">
+                <img class="boxImage-img" :src="`img/box${message.num}_closed.png`" v-if="!message.opened">
                 <img class="boxImage-img" :src="`img/box${message.num}_opened.png`" v-else>
               </div>
             </li>
@@ -50,8 +50,7 @@
 const app = new Vue({
   el: '#app',
   data: {
-    messages: [],
-    per: 0,
+    messages: {},
     modal: null,
     params: {}
   },
@@ -60,24 +59,15 @@ const app = new Vue({
       return response.json();
     }).then(json => {
       this.messages = json;
-      this.random();
       this.setParams();
-      this.per = Math.ceil(this.messages.length / 3);
+      for (const name of ['top', 'middle', 'bottom']) {
+        for (const v of this.messages[name]) {
+          v.num = Math.floor(Math.random() * 3) + 1;
+        }
+      }
     });
   },
   methods: {
-    random () {
-      for(let i = this.messages.length - 1; i > 0; i--) {
-        const r = Math.floor(Math.random() * (i + 1));
-        const tmp = this.messages[i];
-        tmp.num = Math.floor(Math.random() * 3) + 1;
-        this.messages[i] = this.messages[r];
-        this.messages[r] = tmp;
-      }
-      for(let i = this.messages.length - 1; i > 0; i--) {
-        this.messages[i].num = Math.floor(Math.random() * 3) + 1;
-      }
-    },
     setParams () {
       const urlParam = location.search.substring(1);
       if (urlParam) {
@@ -85,13 +75,6 @@ const app = new Vue({
           const keyVal = v.split('=');
           this.params[keyVal[0]] = keyVal[1];
         });
-      }
-    },
-    getMessages (name) {
-      switch (name) {
-        case 'top': return this.top;
-        case 'middle': return this.middle;
-        case 'bottom': return this.bottom;
       }
     },
     open (message) {
@@ -106,17 +89,6 @@ const app = new Vue({
     clickModalArea (e) {
       e.stopPropagation();
     }
-  },
-  computed: {
-    top () {
-      return this.messages.filter((v, i) => i >= 0 && i < this.per);
-    },
-    middle () {
-      return this.messages.filter((v, i) => i >= this.per && i < this.per * 2);
-    },
-    bottom () {
-      return this.messages.filter((v, i) => i >= this.per * 2 && i < this.per * 3);
-    }
   }
 });
 </script>
@@ -127,6 +99,7 @@ const app = new Vue({
   padding: 0;
   list-style: none;
   max-width: 100%;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 body {
@@ -143,9 +116,18 @@ body {
 .mainImage {
   background: url('img/bg.png');
   min-height: 360px;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
   flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
   justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
   align-items: center;
   border-top: 10px solid #112;
   border-bottom: 6px double #a1984a;
@@ -166,26 +148,12 @@ body {
   position: relative;
   overflow: hidden;
 }
-.boxListWrapper::before,
-.boxListWrapper::after {
-  position: absolute;
-  content: '';
-  top: 0;
-  bottom: 0;
-  width: 50px;
-  z-index: 100;
-  pointer-events: none;
-}
-.boxListWrapper::before {
-  background: linear-gradient(to right, #ddd, transparent);
-  left: 0;
-}
-.boxListWrapper::after {
-  background: linear-gradient(to left, #ddd, transparent);
-  right: 0;
-}
 .boxList {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  width: -webkit-max-content;
+  width: -moz-max-content;
   width: max-content;
   max-width: none;
 }
@@ -205,8 +173,14 @@ body {
   cursor: pointer;
   border-radius: 100px;
   overflow: visible;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
   justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
   align-items: center;
 }
 .box .name {
@@ -231,10 +205,17 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
   justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
   align-items: center;
   z-index: 1000;
+  -webkit-animation: fadeIn .2s ease 0s;
   animation: fadeIn .2s ease 0s;
 }
 .modal-content {
@@ -269,8 +250,14 @@ body {
   position: absolute;
   top: 10px;
   right: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
   justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
   align-items: center;
   width: 24px;
   height: 24px;
@@ -282,8 +269,14 @@ body {
   cursor: pointer;
 }
 footer {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
   justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
   align-items: center;
   background: #112;
   min-height: 120px;
@@ -291,20 +284,52 @@ footer {
   color: #818181;
   text-align: center;
 }
+@-webkit-keyframes scroll1 {
+  0% {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+  }
+  100% {
+    -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+  }
+}
 @keyframes scroll1 {
   0% {
+    -webkit-transform: translateX(0);
     transform: translateX(0);
   }
   100% {
+    -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+  }
+}
+@-webkit-keyframes scroll2 {
+  0% {
+    -webkit-transform: translateX(-50%);
     transform: translateX(-50%);
+  }
+  100% {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
   }
 }
 @keyframes scroll2 {
   0% {
+    -webkit-transform: translateX(-50%);
     transform: translateX(-50%);
   }
   100% {
+    -webkit-transform: translateX(0);
     transform: translateX(0);
+  }
+}
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 @keyframes fadeIn {
