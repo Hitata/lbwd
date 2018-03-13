@@ -26,8 +26,8 @@
             <li class="box" v-for="(message, i) in getMessages(row)" :key="i" :class="{ opened: message.opened }" @click="open(message)">
               <div class="name">{{ message.name }}</div>
               <div class="boxImage">
-                <img class="boxImage-box" :src="`img/box${message.num}.png`">
-                <img class="boxImage-cover" :src="`img/cover${message.num}.png`" v-if="!message.opened">
+                <img class="boxImage-img" :src="`img/box${message.num}.png`" v-if="!message.opened">
+                <img class="boxImage-img" :src="`img/box${message.num}_opened.png`" v-else>
               </div>
             </li>
           </template>
@@ -95,8 +95,10 @@ const app = new Vue({
       }
     },
     open (message) {
-      this.modal = message;
-      message.opened = true;
+      Vue.set(message, 'opened', true);
+      setTimeout(() => {
+        this.modal = message;
+      }, 100)
     },
     close (e) {
       this.modal = null;
@@ -218,16 +220,8 @@ body {
 }
 .boxImage {
   width: 60%;
-  position: relative;
 }
-.boxImage-box {
-  width: 100%;
-}
-.boxImage-cover {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+.boxImage-img {
   width: 100%;
 }
 .modal {
@@ -241,6 +235,7 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn .2s ease 0s;
 }
 .modal-content {
   position: relative;
@@ -251,10 +246,12 @@ body {
   width: 90%;
   max-width: 400px;
   line-height: 1.9;
+  font-size: 16px;
 }
 .modal-content-name {
   text-align: center;
   margin-top: 10px;
+  font-size: 14px;
 }
 .button {
   display: block;
@@ -308,6 +305,14 @@ footer {
   }
   100% {
     transform: translateX(0);
+  }
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 @media (max-width: 600px) {
