@@ -154,10 +154,10 @@ body {
 }
 .boxList.top,
 .boxList.bottom {
-  animation: scroll1 40s linear 0s infinite normal;
+  animation: scroll1 30s linear 0s infinite normal;
 }
 .boxList.middle {
-  animation: scroll2 40s linear 0s infinite normal;
+  animation: scroll2 30s linear 0s infinite normal;
 }
 .box {
   position: relative;
