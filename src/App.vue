@@ -11,9 +11,9 @@
       </div>
       <div class="container">
         <div class="boxListWrapper">
-          <template v-for="(row, rowIndex) in ['top', 'middle', 'bottom']">
-            <ul class="boxList" :class="row">
-              <template v-for="(col, columnIndex) in ['first', 'second']">
+          <template v-for="(row) in ['top', 'middle', 'bottom']">
+            <ul class="boxList" :class="row" :key="row">
+              <template v-for="(col) in ['first', 'second']">
                 <li class="box" v-for="(message, messageIndex) in messages[row]" :class="{ opened: message.opened }" @click="open(message)">
                   <div class="name">{{ message.name }}</div>
                   <div class="boxImage">
