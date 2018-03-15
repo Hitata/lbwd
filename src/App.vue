@@ -3,10 +3,9 @@
     <template v-if="messages">
       <div class="mainImage">
         <img src="../src/img/logo.png" alt="">
-        <div class="mainMessage">
-          <p>先日は素敵なバレンタインデーをありがとうございました！</p>
-          <p>男性社員からそれぞれメッセージが届いていますので、</p>
-          <p>ぜひ、気に入ったメッセージからギフトをお受取りください！</p>
+        <div class="messageArea">
+          <p class="mainMessage">先日は素敵なバレンタインデーをありがとうございました！</p>
+          <p class="mainMessage">男性社員からそれぞれメッセージが届いていますので、ぜひ気に入ったメッセージからギフトをお受取りください！</p>
         </div>
       </div>
       <div class="container">
@@ -131,13 +130,16 @@ body {
   width: 320px;
   margin: auto auto 20px;
 }
-.mainMessage {
+.messageArea {
   margin: 20px auto auto;
   padding: 0 20px;
   font-size: 14px;
-  color: #818181;
-  text-align: center;
+  color: #b0b0b0;
+  text-align: justify;
   line-height: 1.9;
+}
+.mainMessage {
+  margin-bottom: 10px;
 }
 .boxListWrapper {
   position: relative;
