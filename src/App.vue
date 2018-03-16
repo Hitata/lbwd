@@ -3,17 +3,16 @@
     <template v-if="messages">
       <div class="mainImage">
         <img src="../src/img/logo.png" alt="">
-        <div class="mainMessage">
-          <p>先日は素敵なバレンタインデーをありがとうございました！</p>
-          <p>男性社員からそれぞれメッセージが届いていますので、</p>
-          <p>ぜひ、気に入ったメッセージからギフトをお受取りください！</p>
+        <div class="mainArea">
+          <p class="mainMessage">先日は素敵なバレンタインデーをありがとうございました！</p>
+          <p class="mainMessage">男性社員からそれぞれメッセージが届いていますので、ぜひ気に入ったメッセージからギフトをお受取りください！</p>
         </div>
       </div>
       <div class="container">
         <div class="boxListWrapper">
-          <template v-for="(row, rowIndex) in ['top', 'middle', 'bottom']">
-            <ul class="boxList" :class="row">
-              <template v-for="(col, columnIndex) in ['first', 'second']">
+          <template v-for="(row) in ['top', 'middle', 'bottom']">
+            <ul class="boxList" :class="row" :key="row">
+              <template v-for="(col) in ['first', 'second']">
                 <li class="box" v-for="(message, messageIndex) in messages[row]" :class="{ opened: message.opened }" @click="open(message)">
                   <div class="name">{{ message.name }}</div>
                   <div class="boxImage">
@@ -131,13 +130,16 @@ body {
   width: 320px;
   margin: auto auto 20px;
 }
-.mainMessage {
+.mainArea {
   margin: 20px auto auto;
-  padding: 0 20px;
+  padding: 0 30px;
   font-size: 14px;
-  color: #818181;
-  text-align: center;
+  color: #b0b0b0;
+  text-align: justify;
   line-height: 1.9;
+}
+.mainMessage {
+  margin-bottom: 15px;
 }
 .boxListWrapper {
   position: relative;
@@ -154,10 +156,10 @@ body {
 }
 .boxList.top,
 .boxList.bottom {
-  animation: scroll1 40s linear 0s infinite normal;
+  animation: scroll1 30s linear 0s infinite normal;
 }
 .boxList.middle {
-  animation: scroll2 40s linear 0s infinite normal;
+  animation: scroll2 30s linear 0s infinite normal;
 }
 .box {
   position: relative;
@@ -345,4 +347,3 @@ footer {
   }
 }
 </style>
-
